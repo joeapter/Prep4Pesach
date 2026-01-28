@@ -1,0 +1,51 @@
+{
+  "name": "Prep4Pesach",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --ext .ts,.tsx",
+    "seed:dev": "ts-node scripts/seed-dev.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.28.2",
+  "dependencies": {
+    "@fullcalendar/core": "^6.1.20",
+    "@fullcalendar/daygrid": "^6.1.20",
+    "@fullcalendar/interaction": "^6.1.20",
+    "@fullcalendar/react": "^6.1.20",
+    "@fullcalendar/timegrid": "^6.1.20",
+    "@hookform/resolvers": "^5.2.2",
+    "@react-pdf/renderer": "^4.3.2",
+    "@supabase/auth-helpers-nextjs": "^0.15.0",
+    "@supabase/auth-helpers-react": "^0.15.0",
+    "@supabase/supabase-js": "^2.93.2",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "next": "^16.1.6",
+    "next-pwa": "^5.6.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-hook-form": "^7.71.1",
+    "resend": "^6.9.1",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.3",
+    "@types/node": "^25.0.10",
+    "@types/react": "^19.2.10",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.23",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "^16.1.6",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
