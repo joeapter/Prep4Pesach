@@ -1,6 +1,6 @@
 # Prep4Pesach - Pesach Cleaning Business Platform
 
-This repository will host the full-stack MVP for a Pesach cleaning company in Ramat Beit Shemesh. It pairs a **Next.js (App Router) + shadcn/ui** front end with **Supabase** (Postgres, Auth, Storage, RLS) and supporting services (Resend emails, PDF invoices, payroll tracking, PWA support). The focus during this phase is on the data foundation: schema, policies, and developer tooling to seed a working dataset.
+This repository will host the full-stack MVP for a Pesach cleaning company in Ramat Beit Shemesh. It pairs a **Next.js (App Router) + shadcn/ui** front end with **Supabase** (Postgres, Auth, Storage, RLS) and supporting services (PDF invoices, payroll tracking, SMTP email via Migadu, PWA support). The focus during this phase is on the data foundation: schema, policies, and developer tooling to seed a working dataset.
 
 - **Supabase schema + policies:** `supabase/migrations/000_init.sql` defines the core tables (`profiles`, `clients`, `workers`, `slots`, `jobs`, `time_entries`, `invoices`, etc.) plus helper functions (`app.is_admin()`, `app.current_worker_id()`, etc.) and the RLS policies that enforce role-based access.
 - **Seed helpers:** `scripts/seed-dev.ts` uses the Supabase service role API to provision example admin/worker/client users, a slot, a job, time entries, an invoice, and a payroll payment. `supabase/seed.sql` contains a commented template of the same records for manual insertion if you prefer SQL.
@@ -29,13 +29,26 @@ Copy `.env.example` to `.env.local` and fill in the values:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `RESEND_API_KEY` (used later for sending invoices)
-- `RESEND_FROM_EMAIL`
+- `SMTP_HOST` (e.g., `smtp.migadu.com`)
+- `SMTP_PORT` (typically 465 with TLS)
+- `SMTP_USER` (e.g., `bookings@prep4pesach.com`)
+- `SMTP_PASS` (the Migadu mailbox password)
+- `SMTP_FROM` (same as the Migadu address)
+- `BOOKING_NOTIFICATION_RECIPIENTS` (comma-separated list: `tova@prep4pesach.com,batya@prep4pesach.com`)
 - `APP_BASE_URL`
+
+## Email configuration (Migadu SMTP)
+
+1. Create the `bookings@prep4pesach.com` mailbox inside your Migadu control panel.
+2. Configure SPF/DKIM for `prep4pesach.com` per Migadu’s instructions so that emails sent through `smtp.migadu.com` pass authentication.
+3. Verify the mailbox password and use it for `SMTP_PASS`, plus keep `SMTP_USER`/`SMTP_FROM` set to `bookings@prep4pesach.com`.
+4. Fill `BOOKING_NOTIFICATION_RECIPIENTS=tova@prep4pesach.com,batya@prep4pesach.com` so all invoice/booking emails bcc those addresses.
+5. When you deploy to Vercel, set the same environment variables (especially the secrets) in the project dashboard so `lib/email/smtp.ts` can create the transporter.
+6. Optionally add forwarding rules inside Migadu if you want the mailbox to receive inbound copies or store sent copies; the app already copies the internal team via BCC so they stay notified.
 
 ## Next steps
 
-1. Add Supabase route handlers & server actions (slot generation, job creation, invoice PDF upload + Resend email) that use `lib/supabase/{client,server,service}.ts`.
+1. Add Supabase route handlers & server actions (slot generation, job creation, invoice PDF upload + SMTP email) that use `lib/supabase/{client,server,service}.ts`.
 2. Implement richer forms, FullCalendar interactions, and payroll exports on the admin dashboard.
 3. Enhance the mobile worker experience with offline-friendly behavior and detailed punch-in history.
 
@@ -47,4 +60,4 @@ The following `app/api/*` routes already use the Supabase helpers for the admin-
 - `POST /api/jobs/create` – creates a job for the authenticated client, marks the slot as booked, and stores the hourly rate.
 - `POST /api/time-entries/approve` – admin endpoint to approve or reject a worker’s time entry, stamping the approver.
 - `POST /api/invoices/generate` – summarizes a job’s approved hours, creates invoice records + lines, renders the PDF with `@react-pdf/renderer`, uploads it to Supabase Storage, and returns the public URL.
-- `POST /api/invoices/send` – delivers the generated invoice via Resend email and updates the invoice status/timestamp.
+- `POST /api/invoices/send` – delivers the generated invoice via the Migadu SMTP transport, bcc’ing the notification recipients and updating the invoice status/timestamp.

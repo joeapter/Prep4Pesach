@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseService } from '@/lib/supabase/service';
-import { sendInvoiceEmail } from '@/lib/email/resend';
+import { sendEmail } from '@/lib/email/smtp';
 
 type SendBody = {
   invoice_id: string;
@@ -36,11 +36,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Missing client email.' }, { status: 400 });
   }
 
-  await sendInvoiceEmail({
+  const watchers = (process.env.BOOKING_NOTIFICATION_RECIPIENTS ?? '')
+    .split(',')
+    .map((candidate) => candidate.trim())
+    .filter(Boolean);
+
+  await sendEmail({
     to: clientEmail,
-    subject: `Your invoice ${invoice.id}`,
+    bcc: watchers.length ? watchers : undefined,
+    subject: `Your Prep4Pesach invoice ${invoice.id}`,
     text: `Your invoice is ready. Download it here: ${urlData.publicUrl}`,
-    html: `<p>Your invoice is ready.</p><p><a href="${urlData.publicUrl}">Download PDF</a></p>`
+    html: `<p>Hi ${invoice.clients?.full_name ?? 'client'},</p><p>Your invoice is ready. <a href="${urlData.publicUrl}">Download the PDF</a>.</p>`
   });
 
   await supabaseService
