@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { supabaseClient } from "@/lib/supabase/client";
+import { readJson } from "@/lib/http";
 
 const services = [
   {
@@ -79,6 +81,21 @@ const sitemap = [
 
 export default function HomePage() {
   const [active, setActive] = useState("general");
+  const [modal, setModal] = useState<"signup" | "signin" | null>(null);
+  const [signupForm, setSignupForm] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    password: "",
+  });
+  const [signupMessage, setSignupMessage] = useState<string | null>(null);
+  const [signupLoading, setSignupLoading] = useState(false);
+  const [signinForm, setSigninForm] = useState({
+    email: "",
+    password: "",
+  });
+  const [signinMessage, setSigninMessage] = useState<string | null>(null);
+  const [signinLoading, setSigninLoading] = useState(false);
   const panelRefs = useRef<Record<string, HTMLElement | null>>({});
 
   const panels = useMemo(
@@ -96,6 +113,66 @@ export default function HomePage() {
       panel.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }, [active]);
+
+  useEffect(() => {
+    if (!modal) {
+      return;
+    }
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setModal(null);
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [modal]);
+
+  const handleSignup = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSignupLoading(true);
+    setSignupMessage(null);
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          full_name: signupForm.fullName,
+          email: signupForm.email,
+          password: signupForm.password,
+          phone: signupForm.phone,
+        }),
+      });
+      const payload = await readJson<{ error?: string }>(response);
+
+      setSignupLoading(false);
+      if (!response.ok) {
+        setSignupMessage(payload?.error ?? "Unable to create account.");
+        return;
+      }
+
+      setSignupMessage("Account created. You can now sign in.");
+    } catch {
+      setSignupLoading(false);
+      setSignupMessage("Failed to fetch. Please try again.");
+    }
+  };
+
+  const handleSignin = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSigninLoading(true);
+    setSigninMessage(null);
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email: signinForm.email,
+      password: signinForm.password,
+    });
+
+    setSigninLoading(false);
+    if (error) {
+      setSigninMessage(error.message);
+      return;
+    }
+    setSigninMessage("Signed in. Refresh page to access your workspace.");
+  };
 
   return (
     <div className="page">
@@ -118,12 +195,32 @@ export default function HomePage() {
           </ul>
         </nav>
         <div>
-          <a className="btn-link" href="/login">
+          <button
+            className="btn-link"
+            type="button"
+            aria-haspopup="dialog"
+            aria-controls="signin-panel"
+            aria-expanded={modal === "signin"}
+            onClick={() => {
+              setModal("signin");
+              setSigninMessage(null);
+            }}
+          >
             Login
-          </a>
-          <a className="btn-link" href="/signup">
+          </button>
+          <button
+            className="btn-link"
+            type="button"
+            aria-haspopup="dialog"
+            aria-controls="signup-panel"
+            aria-expanded={modal === "signup"}
+            onClick={() => {
+              setModal("signup");
+              setSignupMessage(null);
+            }}
+          >
             Create Account
-          </a>
+          </button>
         </div>
       </header>
 
@@ -191,6 +288,134 @@ export default function HomePage() {
               </div>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section
+        className={`modal-overlay${modal ? " open" : ""}`}
+        id="modal-overlay"
+        onClick={(event) => {
+          if (event.target === event.currentTarget) {
+            setModal(null);
+          }
+        }}
+      >
+        <div
+          className={`modal${modal === "signup" ? " active" : ""}`}
+          id="signup-panel"
+          aria-hidden={modal !== "signup"}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="modal-header">
+            <h3>Create an account</h3>
+            <button className="modal-close" type="button" onClick={() => setModal(null)}>
+              &times;
+            </button>
+          </div>
+          <p className="modal-intro">Join Prep4Pesach and schedule your personalized clean in a few clicks.</p>
+          <form className="modal-form" onSubmit={handleSignup}>
+            <label>
+              Full name
+              <input
+                type="text"
+                placeholder="Sarah Cohen"
+                required
+                value={signupForm.fullName}
+                onChange={(event) => setSignupForm((prev) => ({ ...prev, fullName: event.target.value }))}
+              />
+            </label>
+            <label>
+              Email
+              <input
+                type="email"
+                placeholder="you@example.com"
+                required
+                value={signupForm.email}
+                onChange={(event) => setSignupForm((prev) => ({ ...prev, email: event.target.value }))}
+              />
+            </label>
+            <label>
+              Phone
+              <input
+                type="tel"
+                placeholder="+972 50 123 4567"
+                value={signupForm.phone}
+                onChange={(event) => setSignupForm((prev) => ({ ...prev, phone: event.target.value }))}
+              />
+            </label>
+            <label>
+              Password
+              <input
+                type="password"
+                placeholder="Create a password"
+                required
+                minLength={8}
+                value={signupForm.password}
+                onChange={(event) => setSignupForm((prev) => ({ ...prev, password: event.target.value }))}
+              />
+            </label>
+            <button type="submit" className="primary full" disabled={signupLoading}>
+              {signupLoading ? "Creating account..." : "Create account"}
+            </button>
+            {signupMessage && (
+              <p className="modal-footnote modal-message" aria-live="polite">
+                {signupMessage}
+              </p>
+            )}
+            <p className="modal-footnote">
+              We’ll email you confirmation and allow you to manage bookings inside the Prep4Pesach portal.
+            </p>
+          </form>
+        </div>
+
+        <div
+          className={`modal${modal === "signin" ? " active" : ""}`}
+          id="signin-panel"
+          aria-hidden={modal !== "signin"}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="modal-header">
+            <h3>Sign in</h3>
+            <button className="modal-close" type="button" onClick={() => setModal(null)}>
+              &times;
+            </button>
+          </div>
+          <p className="modal-intro">Continue to your account to manage bookings, availability, and payments.</p>
+          <form className="modal-form" onSubmit={handleSignin}>
+            <label>
+              Email
+              <input
+                type="email"
+                placeholder="you@example.com"
+                required
+                value={signinForm.email}
+                onChange={(event) => setSigninForm((prev) => ({ ...prev, email: event.target.value }))}
+              />
+            </label>
+            <label>
+              Password
+              <input
+                type="password"
+                placeholder="Password"
+                required
+                value={signinForm.password}
+                onChange={(event) => setSigninForm((prev) => ({ ...prev, password: event.target.value }))}
+              />
+            </label>
+            <button type="submit" className="primary full" disabled={signinLoading}>
+              {signinLoading ? "Signing in..." : "Sign in"}
+            </button>
+            {signinMessage && (
+              <p className="modal-footnote modal-message" aria-live="polite">
+                {signinMessage}
+              </p>
+            )}
+            <p className="modal-footnote">
+              Forgot your password? <a href="#">Reset it here</a>.
+            </p>
+          </form>
         </div>
       </section>
 

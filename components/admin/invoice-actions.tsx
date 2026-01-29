@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { readJson } from '@/lib/http';
 
 type Props = {
   invoiceId: string;
@@ -35,8 +36,8 @@ export function InvoiceActions({ invoiceId, email }: Props) {
       return;
     }
 
-    const payload = await response.json();
-    setStatus(payload.error ?? 'Unable to send invoice.');
+    const payload = await readJson<{ error?: string }>(response);
+    setStatus(payload?.error ?? 'Unable to send invoice.');
   };
 
   return (

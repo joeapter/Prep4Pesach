@@ -258,6 +258,98 @@
         }
       }
 
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 30;
+        background: rgba(2, 6, 23, 0.65);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+
+      .modal-overlay.open {
+        display: flex;
+      }
+
+      .modal {
+        background: #fff;
+        border-radius: 24px;
+        padding: 2.5rem;
+        width: min(560px, 90vw);
+        box-shadow: 0 40px 80px rgba(15, 23, 42, 0.35);
+        position: relative;
+        display: none;
+      }
+
+      .modal.active {
+        display: block;
+      }
+
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+
+      .modal-header h3 {
+        margin: 0;
+        font-size: 1.75rem;
+      }
+
+      .modal-close {
+        background: transparent;
+        border: none;
+        font-size: 1.5rem;
+        line-height: 1;
+        cursor: pointer;
+        color: var(--muted);
+      }
+
+      .modal-intro {
+        margin: 0 0 1.75rem;
+        color: rgba(15, 23, 42, 0.7);
+      }
+
+      .modal-form {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .modal-form label {
+        display: flex;
+        flex-direction: column;
+        font-size: 0.85rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: rgba(15, 23, 42, 0.6);
+        gap: 0.35rem;
+      }
+
+      .modal-form input {
+        border-radius: 10px;
+        border: 1px solid rgba(15, 23, 42, 0.1);
+        padding: 0.85rem 1rem;
+        font-size: 1rem;
+      }
+
+      .primary.full {
+        width: 100%;
+      }
+
+      .modal-footnote {
+        margin: 0;
+        font-size: 0.85rem;
+        color: rgba(15, 23, 42, 0.65);
+      }
+
+      .modal-footnote a {
+        color: var(--primary-dark);
+        text-decoration: none;
+      }
+
       .testimonials,
       .sitemap {
         padding: 3rem 4vw 3rem;
@@ -349,8 +441,8 @@
           </ul>
         </nav>
         <div>
-          <button class="btn-link">Login</button>
-          <button class="btn-link">Create Account</button>
+          <button class="btn-link" data-trigger="signin">Login</button>
+          <button class="btn-link" data-trigger="signup">Create Account</button>
         </div>
       </header>
 
@@ -479,6 +571,63 @@
         </div>
       </section>
 
+      <section class="modal-overlay" id="modal-overlay">
+        <div class="modal" id="signup-panel" aria-hidden="true" role="dialog" aria-modal="true">
+          <div class="modal-header">
+            <h3>Create an account</h3>
+            <button class="modal-close" data-close="signup">&times;</button>
+          </div>
+          <p class="modal-intro">
+            Join Prep4Pesach and schedule your personalized clean in a few clicks.
+          </p>
+          <form class="modal-form">
+            <label>
+              Full name
+              <input type="text" placeholder="Sarah Cohen" required />
+            </label>
+            <label>
+              Email
+              <input type="email" placeholder="you@example.com" required />
+            </label>
+            <label>
+              Phone
+              <input type="tel" placeholder="+972 50 123 4567" />
+            </label>
+            <label>
+              Password
+              <input type="password" placeholder="Create a password" required minlength="8" />
+            </label>
+            <button type="submit" class="primary full">Create account</button>
+            <p class="modal-footnote">
+              We’ll email you confirmation and allow you to manage bookings inside the Prep4Pesach portal.
+            </p>
+          </form>
+        </div>
+        <div class="modal" id="signin-panel" aria-hidden="true" role="dialog" aria-modal="true">
+          <div class="modal-header">
+            <h3>Sign in</h3>
+            <button class="modal-close" data-close="signin">&times;</button>
+          </div>
+          <p class="modal-intro">
+            Continue to your account to manage bookings, availability, and payments.
+          </p>
+          <form class="modal-form">
+            <label>
+              Email
+              <input type="email" placeholder="you@example.com" required />
+            </label>
+            <label>
+              Password
+              <input type="password" placeholder="Password" required />
+            </label>
+            <button type="submit" class="primary full">Sign in</button>
+            <p class="modal-footnote">
+              Forgot your password? <a href="#">Reset it here</a>.
+            </p>
+          </form>
+        </div>
+      </section>
+
       <section class="testimonials" id="about">
         <h2>Testimonials</h2>
         <div class="testimonial-grid">
@@ -534,6 +683,48 @@
 
     <script>
       (function () {
+        const overlay = document.getElementById("modal-overlay");
+        const signupPanel = document.getElementById("signup-panel");
+        const signinPanel = document.getElementById("signin-panel");
+        const activeClass = "open";
+
+        const openModal = (panelId) => {
+          if (!overlay) return;
+          overlay.classList.add(activeClass);
+          signupPanel?.classList.remove("active");
+          signinPanel?.classList.remove("active");
+          signupPanel?.setAttribute("aria-hidden", "true");
+          signinPanel?.setAttribute("aria-hidden", "true");
+
+          if (panelId === "signup") {
+            signupPanel?.classList.add("active");
+            signupPanel?.setAttribute("aria-hidden", "false");
+          } else {
+            signinPanel?.classList.add("active");
+            signinPanel?.setAttribute("aria-hidden", "false");
+          }
+        };
+
+        const closeModal = () => {
+          overlay?.classList.remove(activeClass);
+          signinPanel?.classList.remove("active");
+          signupPanel?.classList.remove("active");
+          signinPanel?.setAttribute("aria-hidden", "true");
+          signupPanel?.setAttribute("aria-hidden", "true");
+        };
+
+        document.querySelectorAll("[data-trigger]").forEach((btn) => {
+          btn.addEventListener("click", () => openModal(btn.getAttribute("data-trigger")));
+        });
+
+        overlay?.addEventListener("click", (event) => {
+          if (event.target === overlay) closeModal();
+        });
+
+        document.querySelectorAll("[data-close]").forEach((btn) => {
+          btn.addEventListener("click", () => closeModal());
+        });
+
         const grid = document.querySelector(".service-grid");
         if (!grid) {
           return;

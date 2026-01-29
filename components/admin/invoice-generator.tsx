@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { readJson } from '@/lib/http';
 
 type Props = {
   jobId: string;
@@ -26,14 +27,13 @@ export function InvoiceGenerator({ jobId }: Props) {
     });
     setLoading(false);
 
+    const payload = await readJson<{ error?: string; invoice_id?: string }>(response);
     if (!response.ok) {
-      const payload = await response.json();
-      setStatus(payload.error ?? 'Unable to generate invoice.');
+      setStatus(payload?.error ?? 'Unable to generate invoice.');
       return;
     }
 
-    const payload = await response.json();
-    setStatus(`Invoice created (${payload.invoice_id}).`);
+    setStatus(`Invoice created (${payload?.invoice_id ?? 'unknown'}).`);
     router.refresh();
   };
 

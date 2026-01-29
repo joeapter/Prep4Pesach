@@ -1,7 +1,6 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { supabaseClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
@@ -13,6 +12,7 @@ export default function LoginPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
+    setMessage(null);
     const { error } = await supabaseClient.auth.signInWithPassword({
       email,
       password
@@ -28,37 +28,45 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-6 px-6 py-12 rounded-3xl bg-slate-900/60 border border-slate-800">
-      <div>
-        <p className="text-xs uppercase tracking-[0.4em] text-amber-400">Sign in</p>
-        <h1 className="mt-3 text-3xl font-semibold text-white">Admin, worker, or client</h1>
+    <div className="modal-overlay open">
+      <div className="modal active" aria-hidden="false" role="dialog" aria-modal="true">
+        <div className="modal-header">
+          <h3>Sign in</h3>
+          <a className="modal-close" href="/" aria-label="Close">
+            &times;
+          </a>
+        </div>
+        <p className="modal-intro">Continue to your account to manage bookings, availability, and payments.</p>
+        <form className="modal-form" onSubmit={handleSubmit}>
+          <label>
+            Email
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+            />
+          </label>
+          <label>
+            Password
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+          </label>
+          <button className="primary full" type="submit" disabled={loading}>
+            {loading ? 'Signing in…' : 'Sign in'}
+          </button>
+          {message && <p className="modal-footnote modal-message">{message}</p>}
+          <p className="modal-footnote">
+            Forgot your password? <a href="#">Reset it here</a>.
+          </p>
+        </form>
       </div>
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <label className="block text-sm text-slate-400">
-          <span>Email</span>
-          <input
-            className="mt-1 w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-white focus:border-amber-400 focus:outline-none"
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-          />
-        </label>
-        <label className="block text-sm text-slate-400">
-          <span>Password</span>
-          <input
-            className="mt-1 w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-white focus:border-amber-400 focus:outline-none"
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-          />
-        </label>
-        <Button className="w-full" type="submit" disabled={loading}>
-          {loading ? 'Signing in…' : 'Sign in'}
-        </Button>
-      </form>
-      {message && <p className="text-sm text-amber-200">{message}</p>}
     </div>
   );
 }

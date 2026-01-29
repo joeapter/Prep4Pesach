@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
+import { readJson } from '@/lib/http';
 
 export function SlotGenerator() {
   const [from, setFrom] = useState('');
@@ -32,14 +33,13 @@ export function SlotGenerator() {
 
     setLoading(false);
 
+    const payload = await readJson<{ error?: string; created?: number }>(response);
     if (!response.ok) {
-      const payload = await response.json();
-      setStatus(payload.error ?? 'Unable to generate slots.');
+      setStatus(payload?.error ?? 'Unable to generate slots.');
       return;
     }
 
-    const payload = await response.json();
-    setStatus(`${payload.created ?? 0} slots created.`);
+    setStatus(`${payload?.created ?? 0} slots created.`);
     router.refresh();
   };
 

@@ -76,6 +76,7 @@ header img {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+  cursor: pointer;
 }
 
 .hero {
@@ -203,6 +204,10 @@ header img {
   text-align: center;
 }
 
+.service-details-card::before {
+  content: none;
+}
+
 .service-details-card h3 {
   margin: 0;
   font-size: 1.25rem;
@@ -219,20 +224,27 @@ header img {
 }
 
 .service-details-card .drawer-icon {
-  width: 190px;
-  height: 190px;
+  width: 220px;
+  height: 220px;
   border-radius: 32px;
-  background: rgba(50, 151, 226, 0.10);
+  background: rgba(50, 151, 226, 0.06);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
+  border: none;
+  box-shadow: none;
 }
 
 .service-details-card .drawer-icon img {
-  width: 160px;
-  height: 160px;
+  width: 190px;
+  height: 190px;
   object-fit: contain;
+}
+
+.service-details-card {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
 }
 
 .service-details-card button,
@@ -245,6 +257,108 @@ header img {
   font-weight: 600;
   text-decoration: none;
   display: inline-block;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(2, 6, 23, 0.65);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 24px;
+  padding: 2.5rem;
+  width: min(560px, 90vw);
+  box-shadow: 0 40px 80px rgba(15, 23, 42, 0.35);
+  position: relative;
+  display: none;
+}
+
+.modal.active {
+  display: block;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.modal-intro {
+  margin: 0 0 1.75rem;
+  color: rgba(15, 23, 42, 0.7);
+}
+
+.modal-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.modal-form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(15, 23, 42, 0.6);
+  gap: 0.35rem;
+}
+
+.modal-form input {
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+}
+
+.primary.full {
+  width: 100%;
+}
+
+.primary[disabled] {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.modal-footnote {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(15, 23, 42, 0.65);
+}
+
+.modal-footnote a {
+  color: var(--primary-dark);
+  text-decoration: none;
+}
+
+.modal-message {
+  color: rgba(15, 23, 42, 0.9);
 }
 
 @media (prefers-reduced-motion: reduce) {

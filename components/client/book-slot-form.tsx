@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from 'react';
+import { readJson } from '@/lib/http';
 
 type Slot = {
   id: string;
@@ -43,8 +44,8 @@ export function BookSlotForm({ slot }: Props) {
       setAddress('');
       setNotes('');
     } else {
-      const payload = await response.json();
-      setStatus(payload.error ?? 'Something went wrong.');
+      const payload = await readJson<{ error?: string }>(response);
+      setStatus(payload?.error ?? 'Something went wrong.');
     }
   };
 

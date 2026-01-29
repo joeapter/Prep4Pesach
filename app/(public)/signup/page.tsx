@@ -1,12 +1,12 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { supabaseClient } from '@/lib/supabase/client';
+import { readJson } from '@/lib/http';
 
 export default function SignupPage() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -14,67 +14,89 @@ export default function SignupPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
-    const { error } = await supabaseClient.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName
-        }
+    setMessage(null);
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ full_name: fullName, email, password, phone })
+      });
+
+      const payload = await readJson<{ error?: string }>(response);
+      setLoading(false);
+
+      if (!response.ok) {
+        setMessage(payload?.error ?? 'Unable to create account.');
+        return;
       }
-    });
 
-    setLoading(false);
-    if (error) {
-      setMessage(error.message);
-      return;
+      setMessage('Account created. You can now sign in.');
+    } catch {
+      setLoading(false);
+      setMessage('Failed to fetch. Please try again.');
     }
-
-    setMessage('Check your inbox for a confirmation link.');
   };
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-6 px-6 py-12 rounded-3xl bg-slate-900/60 border border-slate-800">
-      <div>
-        <p className="text-xs uppercase tracking-[0.4em] text-amber-400">Create account</p>
-        <h1 className="mt-3 text-3xl font-semibold text-white">Book or work</h1>
+    <div className="modal-overlay open">
+      <div className="modal active" aria-hidden="false" role="dialog" aria-modal="true">
+        <div className="modal-header">
+          <h3>Create an account</h3>
+          <a className="modal-close" href="/" aria-label="Close">
+            &times;
+          </a>
+        </div>
+        <p className="modal-intro">Join Prep4Pesach and schedule your personalized clean in a few clicks.</p>
+        <form className="modal-form" onSubmit={handleSubmit}>
+          <label>
+            Full name
+            <input
+              type="text"
+              placeholder="Sarah Cohen"
+              value={fullName}
+              onChange={(event) => setFullName(event.target.value)}
+              required
+            />
+          </label>
+          <label>
+            Email
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+            />
+          </label>
+          <label>
+            Phone
+            <input
+              type="tel"
+              placeholder="+972 50 123 4567"
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+            />
+          </label>
+          <label>
+            Password
+            <input
+              type="password"
+              placeholder="Create a password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+              minLength={8}
+            />
+          </label>
+          <button className="primary full" type="submit" disabled={loading}>
+            {loading ? 'Creating account…' : 'Create account'}
+          </button>
+          {message && <p className="modal-footnote modal-message">{message}</p>}
+          <p className="modal-footnote">
+            We’ll email you confirmation and allow you to manage bookings inside the Prep4Pesach portal.
+          </p>
+        </form>
       </div>
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <label className="block text-sm text-slate-400">
-          <span>Full name</span>
-          <input
-            className="mt-1 w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-white focus:border-amber-400 focus:outline-none"
-            type="text"
-            placeholder="Full name"
-            value={fullName}
-            onChange={(event) => setFullName(event.target.value)}
-          />
-        </label>
-        <label className="block text-sm text-slate-400">
-          <span>Email</span>
-          <input
-            className="mt-1 w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-white focus:border-amber-400 focus:outline-none"
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-          />
-        </label>
-        <label className="block text-sm text-slate-400">
-          <span>Password</span>
-          <input
-            className="mt-1 w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-white focus:border-amber-400 focus:outline-none"
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-          />
-        </label>
-        <Button className="w-full" type="submit" disabled={loading}>
-          {loading ? 'Creating account…' : 'Create account'}
-        </Button>
-      </form>
-      {message && <p className="text-sm text-amber-200">{message}</p>}
     </div>
   );
 }

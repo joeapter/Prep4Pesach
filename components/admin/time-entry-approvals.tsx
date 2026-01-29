@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { readJson } from '@/lib/http';
 
 type TimeEntry = {
   id: string;
@@ -31,8 +32,8 @@ export function TimeEntryApprovals({ entries }: Props) {
       setSelected((prev) => new Set(prev).add(entryId));
       setMessage(`Entry ${entryId} ${approve ? 'approved' : 'rejected'}.`);
     } else {
-      const payload = await response.json();
-      setMessage(payload.error ?? 'Unable to update entry.');
+      const payload = await readJson<{ error?: string }>(response);
+      setMessage(payload?.error ?? 'Unable to update entry.');
     }
   };
 

@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { BookSlotForm } from '@/components/client/book-slot-form';
-import { createServerClient } from '@/lib/supabase/server';
-import { getOpenSlots } from '@/lib/supabase/queries';
+import { supabaseService } from '@/lib/supabase/service';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,20 +14,24 @@ function formatSlot(slot: { start_at: string; end_at: string }) {
 }
 
 export default async function BookPage() {
-  const supabase = createServerClient();
-  const slots = await getOpenSlots(supabase);
+  const { data } = await supabaseService
+    .from('slots')
+    .select('id, start_at, end_at, capacity_workers, status')
+    .eq('status', 'open')
+    .order('start_at', { ascending: true });
+  const slots = data ?? [];
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-6 px-6 py-12 text-slate-100">
+    <div className="mx-auto flex max-w-4xl flex-col gap-6 px-6 py-12 text-slate-900">
       <h2 className="text-3xl font-semibold">Book a slot</h2>
-      <p className="text-sm text-slate-400">
+      <p className="text-sm text-slate-500">
         Browse open slots, select your desired team size, and submit your job details. The admin will confirm availability
         and invoice you once the job is complete.
       </p>
       <div className="flex flex-col gap-4">
         {slots.map((slot: any) => (
-          <div key={slot.id} className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-            <p className="text-sm text-amber-300">{formatSlot(slot)}</p>
+          <div key={slot.id} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <p className="text-sm text-slate-800">{formatSlot(slot)}</p>
             <p className="text-xs text-slate-500">Capacity: {slot.capacity_workers} workers</p>
             <BookSlotForm slot={slot} />
           </div>
