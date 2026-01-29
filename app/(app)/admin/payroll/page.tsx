@@ -1,6 +1,8 @@
 import { Card } from '@/components/ui/card';
 import { createServerClient } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 type PayrollRow = {
   worker: string;
   hours: number;
@@ -10,14 +12,15 @@ type PayrollRow = {
 
 export default async function AdminPayrollPage() {
   const supabase = createServerClient();
-  const { data: entries = [] } = await supabase
+  const { data } = await supabase
     .from('time_entries')
     .select('minutes_worked, worker:workers(full_name, pay_rate_cents)')
     .eq('status', 'approved');
+  const entries = data ?? [];
 
   const agg = new Map<string, PayrollRow>();
 
-  entries.forEach((entry) => {
+  entries.forEach((entry: any) => {
     const worker = entry.worker?.full_name ?? 'Worker';
     const rate = entry.worker?.pay_rate_cents ?? 0;
     const hours = (entry.minutes_worked ?? 0) / 60;

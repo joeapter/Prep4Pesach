@@ -4,17 +4,25 @@ import { InvoiceGenerator } from '@/components/admin/invoice-generator';
 import { TimeEntryApprovals } from '@/components/admin/time-entry-approvals';
 import { createServerClient } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminJobsPage() {
   const supabase = createServerClient();
-  const { data: jobs = [] } = await supabase
+  const { data: jobData } = await supabase
     .from('jobs')
     .select('id, address_text, status, hourly_rate_cents, slot(*), clients(full_name)')
     .order('created_at', { ascending: false });
-  const { data: pendingEntries = [] } = await supabase
+  const jobs = jobData ?? [];
+  const { data: pendingEntriesData = [] } = await supabase
     .from('time_entries')
-    .select('id, job_id, minutes_worked, punch_in, worker:workers(full_name)')
+    .select('id, job_id, minutes_worked, punch_in, status, worker:workers(full_name)')
     .eq('status', 'pending')
     .order('punch_in', { ascending: false });
+  const pendingEntries =
+    (pendingEntriesData ?? []).map((entry: any) => ({
+      ...entry,
+      worker: Array.isArray(entry.worker) ? entry.worker[0] ?? null : entry.worker
+    })) ?? [];
 
   return (
     <section className="space-y-6">
@@ -23,7 +31,7 @@ export default async function AdminJobsPage() {
         <h2 className="text-2xl font-semibold text-white">Assign workers & approve hours</h2>
       </div>
       <div className="space-y-4">
-        {jobs.map((job) => (
+        {jobs.map((job: any) => (
           <Card key={job.id}>
             <div className="flex flex-col gap-2 text-sm text-slate-300 lg:flex-row lg:items-center lg:justify-between">
               <div>

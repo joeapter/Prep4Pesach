@@ -2,6 +2,8 @@ import { Card } from '@/components/ui/card';
 import { createServerClient } from '@/lib/supabase/server';
 import { getClientJobs } from '@/lib/supabase/queries';
 
+export const dynamic = 'force-dynamic';
+
 const formatDate = (slot?: { start_at: string; end_at: string }) => {
   if (!slot) return 'TBD';
   const start = new Date(slot.start_at);
@@ -23,7 +25,7 @@ export default async function ClientJobsPage() {
         <h2 className="text-2xl font-semibold text-white">Your bookings</h2>
       </div>
       <div className="grid gap-4">
-        {jobs.map((job) => (
+        {jobs.map((job: any) => (
           <Card key={job.id}>
             <div className="flex items-center justify-between">
               <div>

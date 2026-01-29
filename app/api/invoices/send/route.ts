@@ -26,12 +26,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invoice PDF missing.' }, { status: 400 });
   }
 
-  const { data: urlData, error: urlError } = supabaseService.storage.from('invoices').getPublicUrl(invoice.pdf_path);
-  if (urlError) {
-    return NextResponse.json({ error: urlError.message }, { status: 500 });
+  const { data: urlData } = supabaseService.storage.from('invoices').getPublicUrl(invoice.pdf_path);
+  if (!urlData?.publicUrl) {
+    return NextResponse.json({ error: 'Unable to get PDF URL' }, { status: 500 });
   }
 
-  const clientEmail = invoice.clients?.email;
+  const client =
+    Array.isArray(invoice.clients) && invoice.clients.length ? invoice.clients[0] : invoice.clients;
+  const clientEmail = client && !Array.isArray(client) ? client.email : undefined;
+  const clientFullName = client && !Array.isArray(client) ? client.full_name : undefined;
   if (!clientEmail) {
     return NextResponse.json({ error: 'Missing client email.' }, { status: 400 });
   }
@@ -46,7 +49,7 @@ export async function POST(req: Request) {
     bcc: watchers.length ? watchers : undefined,
     subject: `Your Prep4Pesach invoice ${invoice.id}`,
     text: `Your invoice is ready. Download it here: ${urlData.publicUrl}`,
-    html: `<p>Hi ${invoice.clients?.full_name ?? 'client'},</p><p>Your invoice is ready. <a href="${urlData.publicUrl}">Download the PDF</a>.</p>`
+    html: `<p>Hi ${clientFullName ?? 'client'},</p><p>Your invoice is ready. <a href="${urlData.publicUrl}">Download the PDF</a>.</p>`
   });
 
   await supabaseService

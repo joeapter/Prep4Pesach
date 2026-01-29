@@ -3,6 +3,8 @@ import { Card } from '@/components/ui/card';
 import { createServerClient } from '@/lib/supabase/server';
 import { getWorkerAssignedJobs } from '@/lib/supabase/queries';
 
+export const dynamic = 'force-dynamic';
+
 function formatSlot(slot?: { start_at: string; end_at: string }) {
   if (!slot) return 'TBD';
   const start = new Date(slot.start_at);
@@ -24,7 +26,7 @@ export default async function WorkerJobsPage() {
         <h2 className="text-2xl font-semibold text-white">Your assigned jobs</h2>
       </div>
       <div className="space-y-4">
-        {assignments.map((assignment) => (
+        {assignments.map((assignment: any) => (
           <Card key={assignment.id}>
             <div className="flex flex-col gap-3 text-sm text-slate-300 lg:flex-row lg:items-center lg:justify-between">
               <div className="space-y-1">

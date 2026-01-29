@@ -2,12 +2,15 @@ import { Card } from '@/components/ui/card';
 import { SlotGenerator } from '@/components/admin/slot-generator';
 import { createServerClient } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminSlotsPage() {
   const supabase = createServerClient();
-  const { data: slots = [] } = await supabase
+  const { data } = await supabase
     .from('slots')
     .select('id, start_at, end_at, capacity_workers, status, jobs(id, address_text)')
     .order('start_at', { ascending: true });
+  const slots = data ?? [];
 
   return (
     <section className="space-y-6">
@@ -26,7 +29,7 @@ export default async function AdminSlotsPage() {
         </div>
         <div className="mt-4 space-y-3 text-sm text-slate-200">
           {slots.length === 0 && <p className="text-xs text-slate-500">No slots yet.</p>}
-          {slots.map((slot) => (
+          {slots.map((slot: any) => (
             <div key={slot.id} className="rounded-2xl border border-slate-800/70 bg-slate-900/50 p-4">
               <p className="text-sm font-semibold text-white">
                 {new Date(slot.start_at).toLocaleString()} - {new Date(slot.end_at).toLocaleString()}

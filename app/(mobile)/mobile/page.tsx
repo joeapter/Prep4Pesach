@@ -5,15 +5,6 @@ import { Card } from '@/components/ui/card';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabaseClient } from '@/lib/supabase/client';
 
-type JobAssignment = {
-  job: {
-    id: string;
-    address_text: string;
-    slot: { start_at: string; end_at: string };
-    hourly_rate_cents: number;
-  };
-};
-
 type TimeEntrySummary = {
   job_id: string;
   minutes_worked: number;
@@ -23,7 +14,7 @@ export default function MobilePage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [status, setStatus] = useState<string | null>(null);
-  const [assignments, setAssignments] = useState<JobAssignment[]>([]);
+  const [assignments, setAssignments] = useState<any[]>([]);
   const [workerId, setWorkerId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [entries, setEntries] = useState<TimeEntrySummary[]>([]);
@@ -32,7 +23,7 @@ export default function MobilePage() {
     async (worker: string) => {
       const { data } = await supabaseClient
         .from('job_assignments')
-        .select('job(id, address_text, slot(start_at, end_at), hourly_rate_cents)')
+        .select('job:jobs(id, address_text, slot(start_at, end_at), hourly_rate_cents)')
         .eq('worker_id', worker);
       setAssignments(data ?? []);
     },

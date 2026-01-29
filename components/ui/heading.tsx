@@ -1,4 +1,10 @@
-export function Heading({ level = 2, className, children }: React.PropsWithChildren<{ level?: 1 | 2 | 3 | 4; className?: string }>) {
+import type { JSX, PropsWithChildren } from 'react';
+
+export function Heading({
+  level = 2,
+  className,
+  children
+}: PropsWithChildren<{ level?: 1 | 2 | 3 | 4; className?: string }>) {
   const Tag = `h${level}` as keyof JSX.IntrinsicElements;
   return (
     <Tag

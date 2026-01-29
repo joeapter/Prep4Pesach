@@ -88,7 +88,7 @@ export function InvoiceDocument(props: InvoiceTemplateProps) {
           <Text style={{ fontSize: 12, color: '#fbbf24' }}>Bill to</Text>
           <Text>{clientName}</Text>
           <Text>{clientAddress}</Text>
-          <Text className="text-xs text-slate-400">{jobAddress}</Text>
+          <Text style={{ fontSize: 10, color: '#94a3b8' }}>{jobAddress}</Text>
         </View>
 
         <View style={styles.lineHeader}>

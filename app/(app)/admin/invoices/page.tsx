@@ -3,15 +3,18 @@ import { InvoiceActions } from '@/components/admin/invoice-actions';
 import { createServerClient } from '@/lib/supabase/server';
 import { supabaseService } from '@/lib/supabase/service';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminInvoicesPage() {
   const supabase = createServerClient();
-  const { data: invoices = [] } = await supabase
+  const { data } = await supabase
     .from('invoices')
     .select('id, status, total_cents, pdf_path, created_at, clients(full_name, email), job(address_text)')
     .order('created_at', { ascending: false });
+  const invoices = data ?? [];
 
   const enriched = await Promise.all(
-    invoices.map(async (invoice) => {
+    invoices.map(async (invoice: any) => {
       let pdfUrl: string | null = null;
       if (invoice.pdf_path) {
         const { data: urlData } = supabaseService.storage.from('invoices').getPublicUrl(invoice.pdf_path);
@@ -28,7 +31,7 @@ export default async function AdminInvoicesPage() {
         <h2 className="text-2xl font-semibold text-white">Generate, preview, and send</h2>
       </div>
       <div className="space-y-4">
-        {enriched.map((invoice) => (
+        {enriched.map((invoice: any) => (
           <Card key={invoice.id}>
             <div className="flex flex-col gap-2 text-sm text-slate-300 lg:flex-row lg:items-center lg:justify-between">
               <div>

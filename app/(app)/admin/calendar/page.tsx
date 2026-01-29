@@ -2,10 +2,12 @@ import CalendarView from '@/components/admin/calendar-view';
 import { createServerClient } from '@/lib/supabase/server';
 import { getAdminCalendar } from '@/lib/supabase/queries';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminCalendarPage() {
   const supabase = createServerClient();
   const slots = await getAdminCalendar(supabase);
-  const events = slots.map((slot) => ({
+  const events = (slots ?? []).map((slot: any) => ({
     id: slot.id,
     title: slot.jobs?.map((job: any) => job.address_text).join(', ') ?? 'Open slot',
     start: slot.start_at,

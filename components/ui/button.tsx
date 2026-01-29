@@ -1,15 +1,17 @@
 import { cn } from '@/lib/utils';
 
+type ButtonVariant = 'primary' | 'ghost';
+
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'default' | 'ghost';
+  variant?: ButtonVariant;
 };
 
-export function Button({ className, variant = 'default', ...props }: ButtonProps) {
+export function Button({ className, variant = 'primary', ...props }: ButtonProps) {
   const base =
-    'inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2';
-  const variantClasses = {
-    default: 'bg-amber-300 text-slate-950 hover:bg-amber-200 focus-visible:outline-amber-400',
-    ghost: 'bg-transparent text-slate-100 hover:text-white'
+    'inline-flex items-center justify-center rounded-full border px-5 py-3 text-sm font-semibold tracking-wide transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2';
+  const variantClasses: Record<ButtonVariant, string> = {
+    primary: 'bg-[#0047ba] text-white border-transparent hover:bg-[#00329a]',
+    ghost: 'border-[#0047ba] text-[#0047ba] bg-white hover:bg-[#f0f4ff]'
   };
 
   return (

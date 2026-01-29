@@ -2,6 +2,8 @@ import { Card } from '@/components/ui/card';
 import { createServerClient } from '@/lib/supabase/server';
 import { getOpenSlots, getWorkerTimeEntries } from '@/lib/supabase/queries';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminDashboardPage() {
   const supabase = createServerClient();
   const [slots, timeEntries, invoices] = await Promise.all([
@@ -10,8 +12,9 @@ export default async function AdminDashboardPage() {
     supabase.from('invoices').select('*')
   ]);
 
-  const pendingEntries = timeEntries.filter((entry) => entry.status === 'pending').length;
-  const outstandingInvoices = invoices.data?.filter((invoice) => invoice.status === 'draft' || invoice.status === 'sent').length ?? 0;
+  const pendingEntries = timeEntries.filter((entry: any) => entry.status === 'pending').length;
+  const outstandingInvoices =
+    invoices.data?.filter((invoice: any) => invoice.status === 'draft' || invoice.status === 'sent').length ?? 0;
 
   const cards = [
     {

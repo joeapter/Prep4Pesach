@@ -12,7 +12,7 @@ type JobCreationBody = {
 
 export async function POST(req: Request) {
   const body: JobCreationBody = await req.json();
-  const supabase = createRouteSupabaseClient();
+  const supabase = await createRouteSupabaseClient();
   const {
     data: { session }
   } = await supabase.auth.getSession();

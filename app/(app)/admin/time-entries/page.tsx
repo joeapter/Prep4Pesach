@@ -2,26 +2,34 @@ import { Card } from '@/components/ui/card';
 import { TimeEntryApprovals } from '@/components/admin/time-entry-approvals';
 import { createServerClient } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 const STATUS_OPTIONS = ['pending', 'approved', 'rejected'];
 
-export default async function AdminTimeEntriesPage({
-  searchParams
-}: {
-  searchParams?: Record<string, string | string[]>;
-}) {
+export default async function AdminTimeEntriesPage({ searchParams }: any) {
   const statusFilter = Array.isArray(searchParams?.status) ? searchParams.status[0] : searchParams?.status;
   const workerFilter = Array.isArray(searchParams?.worker) ? searchParams.worker[0] : searchParams?.worker;
   const supabase = createServerClient();
-  const { data: entries = [] } = await supabase
+  const { data: entriesData } = await supabase
     .from('time_entries')
     .select(
       'id, punch_in, punch_out, minutes_worked, status, job:jobs(address_text, slot(start_at, end_at)), worker:workers(id, full_name)'
     )
     .order('punch_in', { ascending: false });
 
-  const { data: workers = [] } = await supabase.from('workers').select('id, full_name').order('full_name');
+  const { data: workersData } = await supabase.from('workers').select('id, full_name').order('full_name');
+  const entries = (entriesData ?? []).map((entry: any) => {
+    const normalizedJob = Array.isArray(entry.job) ? entry.job[0] ?? null : entry.job;
+    return {
+      ...entry,
+      job: normalizedJob,
+      job_id: entry.job_id ?? normalizedJob?.id,
+      worker: Array.isArray(entry.worker) ? entry.worker[0] ?? null : entry.worker
+    };
+  });
+  const workers = workersData ?? [];
 
-  const filteredEntries = entries.filter((entry) => {
+  const filteredEntries = entries.filter((entry: any) => {
     if (statusFilter && entry.status !== statusFilter) return false;
     if (workerFilter && entry.worker?.id !== workerFilter) return false;
     return true;
@@ -61,7 +69,7 @@ export default async function AdminTimeEntriesPage({
               className="mt-1 w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-white"
             >
               <option value="">All workers</option>
-              {workers.map((worker) => (
+              {workers.map((worker: any) => (
                 <option key={worker.id} value={worker.id}>
                   {worker.full_name}
                 </option>
@@ -93,7 +101,7 @@ export default async function AdminTimeEntriesPage({
                   </td>
                 </tr>
               )}
-              {filteredEntries.map((entry) => (
+              {filteredEntries.map((entry: any) => (
                 <tr key={entry.id}>
                   <td className="px-4 py-3 font-semibold text-white">{entry.worker?.full_name ?? 'Worker'}</td>
                   <td className="px-4 py-3">{entry.job?.address_text ?? 'Address TBD'}</td>
@@ -114,7 +122,7 @@ export default async function AdminTimeEntriesPage({
           </table>
         </div>
       </Card>
-      <TimeEntryApprovals entries={filteredEntries.filter((entry) => entry.status === 'pending')} />
+      <TimeEntryApprovals entries={filteredEntries.filter((entry: any) => entry.status === 'pending')} />
     </section>
   );
 }

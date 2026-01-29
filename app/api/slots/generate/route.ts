@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: validationError }, { status: 422 });
   }
 
-  const supabase = createRouteSupabaseClient();
+  const supabase = await createRouteSupabaseClient();
   const {
     data: { session }
   } = await supabase.auth.getSession();
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ created: 0 });
   }
 
-  const { error } = await supabaseService.from('slots').insert(slots, { onConflict: 'start_at,end_at' });
+  const { error } = await supabaseService.from('slots').upsert(slots, { onConflict: 'start_at,end_at' });
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

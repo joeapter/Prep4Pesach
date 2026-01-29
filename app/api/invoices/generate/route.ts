@@ -60,10 +60,20 @@ export async function POST(req: Request) {
     line_total_cents: lineTotal
   });
 
+  const getClientValue = (field: 'full_name' | 'address_text') => {
+    if (!job.clients) {
+      return undefined;
+    }
+    if (Array.isArray(job.clients)) {
+      return job.clients[0]?.[field];
+    }
+    return job.clients[field];
+  };
+
   const invoicePdf: InvoiceTemplateProps = {
     invoiceNumber: invoice.id,
-    clientName: job.clients?.full_name ?? 'Client',
-    clientAddress: job.clients?.address_text ?? 'Unknown address',
+    clientName: getClientValue('full_name') ?? 'Client',
+    clientAddress: getClientValue('address_text') ?? 'Unknown address',
     jobAddress: job.address_text,
     createdAt: invoice.created_at ?? new Date().toISOString(),
     lines: [

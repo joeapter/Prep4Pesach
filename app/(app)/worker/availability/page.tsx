@@ -2,6 +2,8 @@ import { Card } from '@/components/ui/card';
 import { createServerClient } from '@/lib/supabase/server';
 import { getWorkerAvailability } from '@/lib/supabase/queries';
 
+export const dynamic = 'force-dynamic';
+
 function formatRange(start: string, end: string) {
   const startAt = new Date(start);
   const endAt = new Date(end);
@@ -27,7 +29,7 @@ export default async function WorkerAvailabilityPage() {
           optional recurring rule.
         </p>
         <div className="mt-4 space-y-2">
-          {availability.map((block) => (
+          {availability.map((block: any) => (
             <div
               key={block.id}
               className="flex items-center justify-between rounded-2xl border border-slate-800 px-4 py-3 text-sm text-slate-200"
