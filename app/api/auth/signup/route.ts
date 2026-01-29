@@ -9,10 +9,14 @@ type SignupBody = {
 };
 
 export async function POST(req: Request) {
-  let body: SignupBody;
+  let body: SignupBody | null = null;
   try {
-    body = (await req.json()) as SignupBody;
+    const raw = await req.text();
+    body = raw ? (JSON.parse(raw) as SignupBody) : null;
   } catch {
+    body = null;
+  }
+  if (!body) {
     return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 });
   }
 
