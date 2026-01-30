@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient } from '@/lib/supabase/server';
 import { supabaseService } from '@/lib/supabase/service';
 
 type SigninBody = {
@@ -21,7 +20,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 });
   }
 
-  const supabase = createRouteHandlerClient({ cookies });
+  const supabase = createServerClient();
   const { data, error } = await supabase.auth.signInWithPassword({
     email: body.email,
     password: body.password
