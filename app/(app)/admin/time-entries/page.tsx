@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/card';
 import { TimeEntryApprovals } from '@/components/admin/time-entry-approvals';
-import { createServerClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth/require-admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,15 +9,15 @@ const STATUS_OPTIONS = ['pending', 'approved', 'rejected'];
 export default async function AdminTimeEntriesPage({ searchParams }: any) {
   const statusFilter = Array.isArray(searchParams?.status) ? searchParams.status[0] : searchParams?.status;
   const workerFilter = Array.isArray(searchParams?.worker) ? searchParams.worker[0] : searchParams?.worker;
-  const supabase = createServerClient();
-  const { data: entriesData } = await supabase
+  const { supabaseService } = await requireAdmin();
+  const { data: entriesData } = await supabaseService
     .from('time_entries')
     .select(
       'id, punch_in, punch_out, minutes_worked, status, job:jobs(address_text, slot(start_at, end_at)), worker:workers(id, full_name)'
     )
     .order('punch_in', { ascending: false });
 
-  const { data: workersData } = await supabase.from('workers').select('id, full_name').order('full_name');
+  const { data: workersData } = await supabaseService.from('workers').select('id, full_name').order('full_name');
   const entries = (entriesData ?? []).map((entry: any) => {
     const normalizedJob = Array.isArray(entry.job) ? entry.job[0] ?? null : entry.job;
     return {

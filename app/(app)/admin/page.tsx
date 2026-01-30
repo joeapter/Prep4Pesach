@@ -1,20 +1,24 @@
 import { Card } from '@/components/ui/card';
-import { createServerClient } from '@/lib/supabase/server';
-import { getOpenSlots, getWorkerTimeEntries } from '@/lib/supabase/queries';
+import { requireAdmin } from '@/lib/auth/require-admin';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
-  const supabase = createServerClient();
-  const [slots, timeEntries, invoices] = await Promise.all([
-    getOpenSlots(supabase),
-    getWorkerTimeEntries(supabase),
-    supabase.from('invoices').select('*')
+  const { supabaseService } = await requireAdmin();
+  const [{ data: slotsData }, { data: timeEntriesData }, { data: invoicesData }] = await Promise.all([
+    supabaseService.from('slots').select('id').eq('status', 'open'),
+    supabaseService.from('time_entries').select('id, status'),
+    supabaseService.from('invoices').select('id, status')
   ]);
 
+  const slots = slotsData ?? [];
+  const timeEntries = timeEntriesData ?? [];
+  const invoices = invoicesData ?? [];
+
   const pendingEntries = timeEntries.filter((entry: any) => entry.status === 'pending').length;
-  const outstandingInvoices =
-    invoices.data?.filter((invoice: any) => invoice.status === 'draft' || invoice.status === 'sent').length ?? 0;
+  const outstandingInvoices = invoices.filter(
+    (invoice: any) => invoice.status === 'draft' || invoice.status === 'sent'
+  ).length;
 
   const cards = [
     {

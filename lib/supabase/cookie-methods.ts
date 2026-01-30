@@ -9,8 +9,15 @@ export function createSupabaseCookieMethods() {
         value: cookie.value ?? ''
       }));
     },
-    setAll: async () => {
-      // Not used by the current helpers.
+    setAll: async (cookiesToSet: Array<{ name: string; value: string; options?: Record<string, any> }>) => {
+      try {
+        const cookieStore = await cookies();
+        cookiesToSet.forEach(({ name, value, options }) => {
+          cookieStore.set({ name, value, ...(options ?? {}) });
+        });
+      } catch {
+        // Ignore when cookies cannot be set in a server component context.
+      }
     }
   };
 }

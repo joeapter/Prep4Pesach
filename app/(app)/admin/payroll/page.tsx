@@ -1,5 +1,5 @@
 import { Card } from '@/components/ui/card';
-import { createServerClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth/require-admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,8 +11,8 @@ type PayrollRow = {
 };
 
 export default async function AdminPayrollPage() {
-  const supabase = createServerClient();
-  const { data } = await supabase
+  const { supabaseService } = await requireAdmin();
+  const { data } = await supabaseService
     .from('time_entries')
     .select('minutes_worked, worker:workers(full_name, pay_rate_cents)')
     .eq('status', 'approved');

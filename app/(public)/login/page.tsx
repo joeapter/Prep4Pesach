@@ -1,30 +1,42 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-import { supabaseClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
+import { readJson } from '@/lib/http';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setMessage(null);
-    const { error } = await supabaseClient.auth.signInWithPassword({
-      email,
-      password
+    const response = await fetch('/api/auth/signin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
     });
+    const payload = await readJson<{ error?: string; role?: string }>(response);
 
     setLoading(false);
-    if (error) {
-      setMessage(error.message);
+    if (!response.ok) {
+      setMessage(payload?.error ?? 'Unable to sign in.');
       return;
     }
 
-    setMessage('Signed in. Refresh page to access your workspace.');
+    if (payload?.role === 'admin') {
+      router.push('/admin');
+      return;
+    }
+    if (payload?.role === 'worker') {
+      router.push('/worker/jobs');
+      return;
+    }
+    router.push('/client/jobs');
   };
 
   return (

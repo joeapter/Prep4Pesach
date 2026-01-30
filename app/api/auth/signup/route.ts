@@ -28,17 +28,32 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Full name, email, and password are required.' }, { status: 400 });
   }
 
-  const { data: userData, error: authError } = await supabaseService.auth.admin.createUser({
-    email: body.email,
-    password: body.password,
-    email_confirm: true,
-    user_metadata: {
-      full_name: body.full_name
-    }
-  });
+  let userData;
+  let authError;
+  try {
+    const result = await supabaseService.auth.admin.createUser({
+      email: body.email,
+      password: body.password,
+      email_confirm: true,
+      user_metadata: {
+        full_name: body.full_name
+      }
+    });
+    userData = result.data;
+    authError = result.error;
+  } catch (error) {
+    console.error('Supabase createUser failed', error);
+    return NextResponse.json(
+      { error: 'Supabase request failed. Check SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.' },
+      { status: 500 }
+    );
+  }
 
   if (authError || !userData.user) {
-    return NextResponse.json({ error: authError?.message ?? 'Unable to create account.' }, { status: 400 });
+    const message = authError?.message?.includes('Unexpected end')
+      ? 'Supabase returned an invalid response. Verify SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel.'
+      : authError?.message ?? 'Unable to create account.';
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 
   const userId = userData.user.id;

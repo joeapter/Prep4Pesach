@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { supabaseClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 import { readJson } from "@/lib/http";
 
 const services = [
@@ -97,6 +97,7 @@ export default function HomePage() {
   const [signinMessage, setSigninMessage] = useState<string | null>(null);
   const [signinLoading, setSigninLoading] = useState(false);
   const panelRefs = useRef<Record<string, HTMLElement | null>>({});
+  const router = useRouter();
 
   const panels = useMemo(
     () =>
@@ -161,17 +162,28 @@ export default function HomePage() {
     event.preventDefault();
     setSigninLoading(true);
     setSigninMessage(null);
-    const { error } = await supabaseClient.auth.signInWithPassword({
-      email: signinForm.email,
-      password: signinForm.password,
+    const response = await fetch("/api/auth/signin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: signinForm.email, password: signinForm.password }),
     });
+    const payload = await readJson<{ error?: string; role?: string }>(response);
 
     setSigninLoading(false);
-    if (error) {
-      setSigninMessage(error.message);
+    if (!response.ok) {
+      setSigninMessage(payload?.error ?? "Unable to sign in.");
       return;
     }
-    setSigninMessage("Signed in. Refresh page to access your workspace.");
+
+    if (payload?.role === "admin") {
+      router.push("/admin");
+      return;
+    }
+    if (payload?.role === "worker") {
+      router.push("/worker/jobs");
+      return;
+    }
+    router.push("/client/jobs");
   };
 
   return (

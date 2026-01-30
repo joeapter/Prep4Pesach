@@ -1,12 +1,12 @@
 import { Card } from '@/components/ui/card';
 import { SlotGenerator } from '@/components/admin/slot-generator';
-import { createServerClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth/require-admin';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminSlotsPage() {
-  const supabase = createServerClient();
-  const { data } = await supabase
+  const { supabaseService } = await requireAdmin();
+  const { data } = await supabaseService
     .from('slots')
     .select('id, start_at, end_at, capacity_workers, status, jobs(id, address_text)')
     .order('start_at', { ascending: true });

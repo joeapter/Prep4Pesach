@@ -1,13 +1,12 @@
 import { Card } from '@/components/ui/card';
 import { InvoiceActions } from '@/components/admin/invoice-actions';
-import { createServerClient } from '@/lib/supabase/server';
-import { supabaseService } from '@/lib/supabase/service';
+import { requireAdmin } from '@/lib/auth/require-admin';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminInvoicesPage() {
-  const supabase = createServerClient();
-  const { data } = await supabase
+  const { supabaseService } = await requireAdmin();
+  const { data } = await supabaseService
     .from('invoices')
     .select('id, status, total_cents, pdf_path, created_at, clients(full_name, email), job(address_text)')
     .order('created_at', { ascending: false });

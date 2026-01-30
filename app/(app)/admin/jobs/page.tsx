@@ -2,18 +2,18 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { InvoiceGenerator } from '@/components/admin/invoice-generator';
 import { TimeEntryApprovals } from '@/components/admin/time-entry-approvals';
-import { createServerClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth/require-admin';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminJobsPage() {
-  const supabase = createServerClient();
-  const { data: jobData } = await supabase
+  const { supabaseService } = await requireAdmin();
+  const { data: jobData } = await supabaseService
     .from('jobs')
     .select('id, address_text, status, hourly_rate_cents, slot(*), clients(full_name)')
     .order('created_at', { ascending: false });
   const jobs = jobData ?? [];
-  const { data: pendingEntriesData = [] } = await supabase
+  const { data: pendingEntriesData = [] } = await supabaseService
     .from('time_entries')
     .select('id, job_id, minutes_worked, punch_in, status, worker:workers(full_name)')
     .eq('status', 'pending')
