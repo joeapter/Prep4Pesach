@@ -49,21 +49,21 @@ export function SlotGenerator() {
         <input
           value={from}
           onChange={(event) => setFrom(event.target.value)}
-          className="rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-white"
+          className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
           placeholder="From (ISO)"
           required
         />
         <input
           value={to}
           onChange={(event) => setTo(event.target.value)}
-          className="rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-white"
+          className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
           placeholder="To (ISO)"
           required
         />
         <input
           value={capacity}
           onChange={(event) => setCapacity(event.target.value)}
-          className="rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-white"
+          className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
           type="number"
           min="1"
           placeholder="Capacity"
@@ -73,7 +73,7 @@ export function SlotGenerator() {
         <input
           value={block}
           onChange={(event) => setBlock(event.target.value)}
-          className="rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-white"
+          className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
           type="number"
           min="30"
           placeholder="Block minutes"
@@ -81,19 +81,19 @@ export function SlotGenerator() {
         <input
           value={buffer}
           onChange={(event) => setBuffer(event.target.value)}
-          className="rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-white"
+          className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
           type="number"
           min="0"
           placeholder="Buffer minutes"
         />
       </div>
       <button
-        className="w-full rounded-2xl bg-slate-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
+        className="w-full rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
         disabled={loading}
       >
         {loading ? 'Generating…' : 'Generate slots'}
       </button>
-      {status && <p className="text-xs text-amber-200">{status}</p>}
+      {status && <p className="text-xs text-slate-500">{status}</p>}
     </form>
   );
 }

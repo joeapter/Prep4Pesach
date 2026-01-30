@@ -27,15 +27,15 @@ export default async function AdminJobsPage() {
   return (
     <section className="space-y-6">
       <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-amber-300">Jobs</p>
-        <h2 className="text-2xl font-semibold text-white">Assign workers & approve hours</h2>
+        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Jobs</p>
+        <h2 className="text-2xl font-semibold text-slate-900">Assign workers & approve hours</h2>
       </div>
       <div className="space-y-4">
         {jobs.map((job: any) => (
           <Card key={job.id}>
-            <div className="flex flex-col gap-2 text-sm text-slate-300 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-2 text-sm text-slate-600 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <p className="text-sm font-semibold text-white">{job.clients?.full_name ?? 'Client'}</p>
+                <p className="text-sm font-semibold text-slate-900">{job.clients?.full_name ?? 'Client'}</p>
                 <p>{job.address_text}</p>
                 <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
                   Rate: ₪{(job.hourly_rate_cents / 100).toFixed(2)}

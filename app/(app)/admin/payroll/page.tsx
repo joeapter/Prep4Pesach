@@ -37,13 +37,13 @@ export default async function AdminPayrollPage() {
   return (
     <section className="space-y-6">
       <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-amber-300">Payroll</p>
-        <h2 className="text-2xl font-semibold text-white">Pay runs & balances</h2>
+        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Payroll</p>
+        <h2 className="text-2xl font-semibold text-slate-900">Pay runs & balances</h2>
       </div>
       <Card>
-        <div className="overflow-x-auto rounded-2xl border border-slate-800">
-          <table className="min-w-full divide-y divide-slate-800 text-left text-sm text-slate-300">
-            <thead className="bg-slate-900/60 text-xs uppercase tracking-[0.2em] text-slate-500">
+        <div className="overflow-x-auto rounded-2xl border border-slate-200">
+          <table className="min-w-full divide-y divide-slate-200 text-left text-sm text-slate-700">
+            <thead className="bg-slate-50 text-xs uppercase tracking-[0.2em] text-slate-500">
               <tr>
                 <th className="px-4 py-3">Worker</th>
                 <th className="px-4 py-3">Hours</th>
@@ -51,10 +51,10 @@ export default async function AdminPayrollPage() {
                 <th className="px-4 py-3">Balance</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800">
+            <tbody className="divide-y divide-slate-200">
               {rows.map((row) => (
                 <tr key={row.worker}>
-                  <td className="px-4 py-4 font-semibold text-white">{row.worker}</td>
+                  <td className="px-4 py-4 font-semibold text-slate-900">{row.worker}</td>
                   <td className="px-4 py-4">{row.hours.toFixed(2)}</td>
                   <td className="px-4 py-4">{row.pay.toLocaleString('en-US', { style: 'currency', currency: 'ILS' })}</td>
                   <td className="px-4 py-4">{row.balance.toLocaleString('en-US', { style: 'currency', currency: 'ILS' })}</td>

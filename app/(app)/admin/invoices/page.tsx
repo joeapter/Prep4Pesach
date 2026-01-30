@@ -26,15 +26,15 @@ export default async function AdminInvoicesPage() {
   return (
     <section className="space-y-6">
       <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-amber-300">Invoices</p>
-        <h2 className="text-2xl font-semibold text-white">Generate, preview, and send</h2>
+        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Invoices</p>
+        <h2 className="text-2xl font-semibold text-slate-900">Generate, preview, and send</h2>
       </div>
       <div className="space-y-4">
         {enriched.map((invoice: any) => (
           <Card key={invoice.id}>
-            <div className="flex flex-col gap-2 text-sm text-slate-300 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-2 text-sm text-slate-600 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <p className="text-sm font-semibold text-white">{invoice.clients?.full_name ?? 'Client'}</p>
+                <p className="text-sm font-semibold text-slate-900">{invoice.clients?.full_name ?? 'Client'}</p>
                 <p className="text-xs uppercase tracking-[0.3em] text-slate-500">{invoice.clients?.email}</p>
                 <p className="text-[10px] text-slate-500">Job: {invoice.job?.address_text ?? 'N/A'}</p>
                 <p className="text-[10px] text-slate-500">
@@ -42,11 +42,11 @@ export default async function AdminInvoicesPage() {
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <p className="text-sm text-amber-200">₪{(invoice.total_cents / 100).toFixed(2)}</p>
-                <span className="rounded-full bg-slate-800/60 px-3 py-1 text-xs">{invoice.status}</span>
+                <p className="text-sm font-semibold text-slate-900">₪{(invoice.total_cents / 100).toFixed(2)}</p>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">{invoice.status}</span>
                 {invoice.pdfUrl && (
                   <a
-                    className="text-xs text-slate-300 underline"
+                    className="text-xs text-slate-600 underline"
                     href={invoice.pdfUrl}
                     target="_blank"
                     rel="noreferrer"

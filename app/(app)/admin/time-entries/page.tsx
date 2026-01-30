@@ -38,20 +38,20 @@ export default async function AdminTimeEntriesPage({ searchParams }: any) {
   return (
     <section className="space-y-8">
       <div className="space-y-2">
-        <p className="text-xs uppercase tracking-[0.3em] text-amber-300">Time entries</p>
-        <h2 className="text-2xl font-semibold text-white">Details & approvals</h2>
-        <p className="text-sm text-slate-400">
+        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Time entries</p>
+        <h2 className="text-2xl font-semibold text-slate-900">Details & approvals</h2>
+        <p className="text-sm text-slate-600">
           Filter by status or worker to narrow down the list before approving entries.
         </p>
       </div>
       <Card>
         <form className="grid gap-4 md:grid-cols-2" method="get" action="/admin/time-entries">
-          <label className="text-xs text-slate-400">
-            <span className="font-semibold text-white">Status</span>
+          <label className="text-xs text-slate-500">
+            <span className="font-semibold text-slate-900">Status</span>
             <select
               name="status"
               defaultValue={statusFilter ?? ''}
-              className="mt-1 w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-white"
+              className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
             >
               <option value="">All statuses</option>
               {STATUS_OPTIONS.map((status) => (
@@ -61,12 +61,12 @@ export default async function AdminTimeEntriesPage({ searchParams }: any) {
               ))}
             </select>
           </label>
-          <label className="text-xs text-slate-400">
-            <span className="font-semibold text-white">Worker</span>
+          <label className="text-xs text-slate-500">
+            <span className="font-semibold text-slate-900">Worker</span>
             <select
               name="worker"
               defaultValue={workerFilter ?? ''}
-              className="mt-1 w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-white"
+              className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
             >
               <option value="">All workers</option>
               {workers.map((worker: any) => (
@@ -79,12 +79,12 @@ export default async function AdminTimeEntriesPage({ searchParams }: any) {
         </form>
       </Card>
       <Card>
-        <p role="status" aria-live="polite" className="text-xs text-slate-400">
+        <p role="status" aria-live="polite" className="text-xs text-slate-500">
           Showing {filteredEntries.length} of {entries.length} entries matched.
         </p>
         <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-sm text-slate-200">
-            <thead className="text-xs uppercase tracking-[0.2em] text-slate-400">
+          <table className="min-w-full text-left text-sm text-slate-700">
+            <thead className="text-xs uppercase tracking-[0.2em] text-slate-500">
               <tr>
                 <th className="px-4 py-3">Worker</th>
                 <th className="px-4 py-3">Job</th>
@@ -93,7 +93,7 @@ export default async function AdminTimeEntriesPage({ searchParams }: any) {
                 <th className="px-4 py-3">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700">
+            <tbody className="divide-y divide-slate-200">
               {filteredEntries.length === 0 && (
                 <tr>
                   <td className="px-4 py-6 text-sm text-slate-500" colSpan={5}>
@@ -103,16 +103,16 @@ export default async function AdminTimeEntriesPage({ searchParams }: any) {
               )}
               {filteredEntries.map((entry: any) => (
                 <tr key={entry.id}>
-                  <td className="px-4 py-3 font-semibold text-white">{entry.worker?.full_name ?? 'Worker'}</td>
+                  <td className="px-4 py-3 font-semibold text-slate-900">{entry.worker?.full_name ?? 'Worker'}</td>
                   <td className="px-4 py-3">{entry.job?.address_text ?? 'Address TBD'}</td>
-                  <td className="px-4 py-3 text-xs text-slate-400">
+                  <td className="px-4 py-3 text-xs text-slate-500">
                     {entry.job?.slot?.start_at
                       ? `${new Date(entry.job.slot.start_at).toLocaleString()} - ${new Date(entry.job.slot.end_at).toLocaleString()}`
                       : 'N/A'}
                   </td>
                   <td className="px-4 py-3">{entry.minutes_worked ?? 0}</td>
                   <td className="px-4 py-3">
-                    <span className="rounded-full bg-slate-800/70 px-2 py-1 text-xs uppercase tracking-[0.2em]">
+                    <span className="rounded-full bg-slate-100 px-2 py-1 text-xs uppercase tracking-[0.2em] text-slate-600">
                       {entry.status}
                     </span>
                   </td>

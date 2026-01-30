@@ -43,13 +43,13 @@ export function InvoiceActions({ invoiceId, email }: Props) {
   return (
     <div className="flex flex-wrap gap-2">
       <button
-        className="rounded-2xl border border-amber-400 px-4 py-1 text-xs uppercase tracking-[0.3em] text-amber-200"
+        className="rounded-full border border-slate-300 px-4 py-1 text-xs uppercase tracking-[0.3em] text-slate-600 hover:bg-slate-100"
         onClick={handleSend}
         disabled={loading}
       >
         {loading ? 'Sending…' : 'Send invoice'}
       </button>
-      {status && <p className="text-xs text-amber-200">{status}</p>}
+      {status && <p className="text-xs text-slate-500">{status}</p>}
     </div>
   );
 }

@@ -40,13 +40,13 @@ export function InvoiceGenerator({ jobId }: Props) {
   return (
     <div className="flex flex-col gap-1">
       <button
-        className="rounded-2xl border border-slate-700 px-3 py-1 text-xs text-slate-200 hover:border-white"
+        className="rounded-full border border-slate-300 px-3 py-1 text-xs text-slate-600 hover:bg-slate-100"
         onClick={handleGenerate}
         disabled={loading}
       >
         {loading ? 'Generating…' : 'Generate invoice'}
       </button>
-      {status && <p className="text-[10px] text-amber-200">{status}</p>}
+      {status && <p className="text-[10px] text-slate-500">{status}</p>}
     </div>
   );
 }

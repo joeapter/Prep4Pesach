@@ -19,8 +19,8 @@ export default async function AdminCalendarPage() {
   return (
     <section className="space-y-6">
       <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-amber-300">Admin calendar</p>
-        <h2 className="text-2xl font-semibold text-white">Slots + job schedule</h2>
+        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Admin calendar</p>
+        <h2 className="text-2xl font-semibold text-slate-900">Slots + job schedule</h2>
       </div>
       <CalendarView events={events} />
     </section>

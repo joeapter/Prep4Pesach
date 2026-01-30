@@ -39,26 +39,29 @@ export function TimeEntryApprovals({ entries }: Props) {
 
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-semibold text-white">Time entry approvals</h3>
-      {entries.length === 0 && <p className="text-xs text-slate-400">No pending entries.</p>}
+      <h3 className="text-sm font-semibold text-slate-900">Time entry approvals</h3>
+      {entries.length === 0 && <p className="text-xs text-slate-500">No pending entries.</p>}
       {entries.map((entry) => (
-        <div key={entry.id} className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-900/40 px-4 py-3 text-sm">
+        <div
+          key={entry.id}
+          className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm md:flex-row md:items-center md:justify-between"
+        >
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-slate-500">{entry.worker?.full_name ?? 'Worker'}</p>
-            <p className="text-sm text-white">Entry {entry.id}</p>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs uppercase tracking-[0.3em] text-slate-400">{entry.worker?.full_name ?? 'Worker'}</p>
+            <p className="text-sm font-semibold text-slate-900">Entry {entry.id}</p>
+            <p className="text-xs text-slate-500">
               {entry.minutes_worked ?? 0} minutes · {new Date(entry.punch_in).toLocaleString()}
             </p>
           </div>
           <div className="flex gap-2">
             <button
-              className="rounded-full border border-emerald-400 px-3 py-1 text-xs text-emerald-300"
+              className="rounded-full border border-emerald-500 px-3 py-1 text-xs font-semibold text-emerald-600 hover:bg-emerald-50"
               onClick={() => handleAction(entry.id, true)}
             >
               Approve
             </button>
             <button
-              className="rounded-full border border-red-400 px-3 py-1 text-xs text-red-300"
+              className="rounded-full border border-rose-400 px-3 py-1 text-xs font-semibold text-rose-500 hover:bg-rose-50"
               onClick={() => handleAction(entry.id, false)}
             >
               Reject
@@ -66,7 +69,7 @@ export function TimeEntryApprovals({ entries }: Props) {
           </div>
         </div>
       ))}
-      {message && <p className="text-xs text-amber-200">{message}</p>}
+      {message && <p className="text-xs text-slate-600">{message}</p>}
     </div>
   );
 }
