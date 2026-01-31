@@ -15,12 +15,13 @@ export type CalendarEvent = {
 
 export default function CalendarView({ events }: { events: CalendarEvent[] }) {
   return (
-    <Card className="p-0">
+    <Card className="overflow-hidden p-0">
       <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView="timeGridWeek"
         events={events}
         height="auto"
+        eventColor="#1d4ed8"
         headerToolbar={{
           left: 'prev,next today',
           center: 'title',

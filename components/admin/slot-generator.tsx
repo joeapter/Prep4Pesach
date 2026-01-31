@@ -88,7 +88,7 @@ export function SlotGenerator() {
         />
       </div>
       <button
-        className="w-full rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+        className="w-full rounded-2xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-600"
         disabled={loading}
       >
         {loading ? 'Generating…' : 'Generate slots'}

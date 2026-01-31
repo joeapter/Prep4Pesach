@@ -4,7 +4,7 @@ export function Card({ className, children }: React.PropsWithChildren<{ classNam
   return (
     <div
       className={cn(
-        'rounded-[28px] border border-slate-200/70 bg-white/90 p-6 shadow-lg shadow-slate-200/40',
+        'rounded-3xl border border-slate-200/80 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.08)]',
         className
       )}
     >
